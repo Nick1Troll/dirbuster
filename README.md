@@ -1,4 +1,4 @@
-# Dirbuster
+# Subbuster
 
 A multithreaded subdomain enumerator written in Python, inspired by Gobuster. Built as a learning project as part of 100 Days of Code.
 
@@ -18,14 +18,14 @@ A multithreaded subdomain enumerator written in Python, inspired by Gobuster. Bu
 ## Installation
 
 ```bash
-git clone git@github.com:Nick1Troll/dirbuster.git
-cd dirbuster
+git clone git@github.com:Nick1Troll/subbuster.git
+cd subbuster
 ```
 
 ## Usage
 
 ```bash
-python dirbuster.py -w <wordlist> -d <domain> [-th <threads>]
+python subbuster.py -w <wordlist> -d <domain> [-th <threads>]
 ```
 
 ### Arguments
@@ -40,18 +40,19 @@ python dirbuster.py -w <wordlist> -d <domain> [-th <threads>]
 
 **Basic scan:**
 ```bash
-python dirbuster.py -w wordlist.txt -d https://www.example.com/
+python subbuster.py -w wordlist.txt -d https://www.example.com/
 ```
 
 **More threads for faster scanning:**
 ```bash
-python dirbuster.py -w wordlist.txt -d https://www.example.com/ -th 50
+python subbuster.py -w wordlist.txt -d https://www.example.com/ -th 50
 ```
 
 ### Example Output
+```
 [OPEN] api.example.com:80
 [OPEN] mail.example.com:443
-
+```
 ## Legal Notice
 
 This tool is intended for use on domains you own or have explicit permission to test. Subdomain enumeration on third-party systems without authorization may be illegal. Use responsibly.

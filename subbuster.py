@@ -4,29 +4,44 @@ from queue import Queue
 import socket
 
 # --- Argument Definition ---
-parser = argparse.ArgumentParser(prog='dirbuster', description='dictionary subdomain enumerator')
+parser = argparse.ArgumentParser(prog='subbuster', description='dictionary subdomain enumerator')
 
 parser.add_argument('-w', '--wordlist', action='store', required=True, help='Wordlist for enumeration')
-parser.add_argument('-d', '--domain', action='store', required=False, help='Domain to enumerate thru')
+parser.add_argument('-d', '--domain', action='store', required=True, help='Domain to enumerate (e.g. example.com or https://www.example.com/)')
 parser.add_argument('-th', '--threads', action='store', type=int, default=10, help='Number of worker threads (default: 10)')
 
 args = parser.parse_args()
 
 # --- Eingaben verarbeiten ---
-domain = str(args.domain)
 world_list_path = args.wordlist
 threads = args.threads
 ports = [80, 443]
+
+
+# --- Domain bereinigen (Protokoll, www, Pfad und Port entfernen) ---
+def clean_domain(raw):
+    raw = raw.strip()
+    # Schema entfernen, falls vorhanden (https://, http://)
+    if "://" in raw:
+        raw = raw.split("://", 1)[1]
+    # Pfad entfernen (alles ab dem ersten /)
+    raw = raw.split("/", 1)[0]
+    # Port entfernen, falls angegeben (example.com:8080)
+    raw = raw.split(":", 1)[0]
+    # führendes www. entfernen
+    if raw.startswith("www."):
+        raw = raw[4:]
+    return raw
+
+
+m_domain = clean_domain(args.domain)
 
 # --- Wordlist einlesen ---
 with open(world_list_path, 'r') as f:
     w_list = [line.strip() for line in f]
 
-# --- Domain bereinigen (Protokoll und www entfernen) ---
-protocol, m_domain = domain.split(":")
-m_domain = m_domain.strip("//").replace("www.", "", 1)
-
 print_lock = threading.Lock()
+
 
 # --- Verbindungscheck per Socket ---
 def single_request(target, port):
@@ -42,12 +57,14 @@ def single_request(target, port):
             with print_lock:
                 print(f"[OPEN] {target}:{port}")
 
+
 # --- Worker Thread ---
 def threader():
     while True:
         target, port = q.get()
         single_request(target, port)
         q.task_done()
+
 
 # --- Threading Setup ---
 q = Queue()
